@@ -1,0 +1,58 @@
+diff --git a/models/yolo.py b/models/yolo.py
+index 332ec11..f8002e8 100644
+--- a/models/yolo.py
++++ b/models/yolo.py
+@@ -62,7 +62,7 @@ class Detect(nn.Module):
+ 
+         box, cls = torch.cat([xi.view(shape[0], self.no, -1) for xi in x], 2).split((self.reg_max * 4, self.nc), 1)
+         dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+-        y = torch.cat((dbox, cls.sigmoid()), 1)
++        y = torch.cat((dbox, cls), 1)
+         return y if self.export else (y, x)
+ 
+     def bias_init(self):
+@@ -111,7 +111,7 @@ class DDetect(nn.Module):
+ 
+         box, cls = torch.cat([xi.view(shape[0], self.no, -1) for xi in x], 2).split((self.reg_max * 4, self.nc), 1)
+         dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+-        y = torch.cat((dbox, cls.sigmoid()), 1)
++        y = torch.cat((dbox, cls), 1)
+         return y if self.export else (y, x)
+ 
+     def bias_init(self):
+@@ -171,7 +171,7 @@ class DualDetect(nn.Module):
+         dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+         box2, cls2 = torch.cat([di.view(shape[0], self.no, -1) for di in d2], 2).split((self.reg_max * 4, self.nc), 1)
+         dbox2 = dist2bbox(self.dfl2(box2), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+-        y = [torch.cat((dbox, cls.sigmoid()), 1), torch.cat((dbox2, cls2.sigmoid()), 1)]
++        y = [torch.cat((dbox, cls), 1), torch.cat((dbox2, cls2), 1)]
+         return y if self.export else (y, [d1, d2])
+ 
+     def bias_init(self):
+@@ -234,7 +234,7 @@ class DualDDetect(nn.Module):
+         dbox = dist2bbox(self.dfl(box), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+         box2, cls2 = torch.cat([di.view(shape[0], self.no, -1) for di in d2], 2).split((self.reg_max * 4, self.nc), 1)
+         dbox2 = dist2bbox(self.dfl2(box2), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+-        y = [torch.cat((dbox, cls.sigmoid()), 1), torch.cat((dbox2, cls2.sigmoid()), 1)]
++        y = [torch.cat((dbox, cls), 1), torch.cat((dbox2, cls2), 1)]
+         return y if self.export else (y, [d1, d2])
+         #y = torch.cat((dbox2, cls2.sigmoid()), 1)
+         #return y if self.export else (y, d2)
+@@ -313,7 +313,7 @@ class TripleDetect(nn.Module):
+         dbox2 = dist2bbox(self.dfl2(box2), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+         box3, cls3 = torch.cat([di.view(shape[0], self.no, -1) for di in d3], 2).split((self.reg_max * 4, self.nc), 1)
+         dbox3 = dist2bbox(self.dfl3(box3), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+-        y = [torch.cat((dbox, cls.sigmoid()), 1), torch.cat((dbox2, cls2.sigmoid()), 1), torch.cat((dbox3, cls3.sigmoid()), 1)]
++        y = [torch.cat((dbox, cls), 1), torch.cat((dbox2, cls2), 1), torch.cat((dbox3, cls3), 1)]
+         return y if self.export else (y, [d1, d2, d3])
+ 
+     def bias_init(self):
+@@ -397,7 +397,7 @@ class TripleDDetect(nn.Module):
+         dbox3 = dist2bbox(self.dfl3(box3), self.anchors.unsqueeze(0), xywh=True, dim=1) * self.strides
+         #y = [torch.cat((dbox, cls.sigmoid()), 1), torch.cat((dbox2, cls2.sigmoid()), 1), torch.cat((dbox3, cls3.sigmoid()), 1)]
+         #return y if self.export else (y, [d1, d2, d3])
+-        y = torch.cat((dbox3, cls3.sigmoid()), 1)
++        y = torch.cat((dbox3, cls3), 1)
+         return y if self.export else (y, d3)
+ 
+     def bias_init(self):

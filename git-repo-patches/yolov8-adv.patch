@@ -1,0 +1,35 @@
+diff --git a/ultralytics/nn/modules/head.py b/ultralytics/nn/modules/head.py
+index 95c6457f..4771a5ae 100644
+--- a/ultralytics/nn/modules/head.py
++++ b/ultralytics/nn/modules/head.py
+@@ -67,7 +67,8 @@ class Detect(nn.Module):
+             img_size = torch.tensor([img_w, img_h, img_w, img_h], device=dbox.device).reshape(1, 4, 1)
+             dbox /= img_size
+ 
+-        y = torch.cat((dbox, cls.sigmoid()), 1)
++        #y = torch.cat((dbox, cls.sigmoid()), 1)
++        y = torch.cat((dbox, cls), 1)
+         return y if self.export else (y, x)
+ 
+     def bias_init(self):
+diff --git a/ultralytics/utils/torch_utils.py b/ultralytics/utils/torch_utils.py
+index be8aa3b2..bee6cb4c 100644
+--- a/ultralytics/utils/torch_utils.py
++++ b/ultralytics/utils/torch_utils.py
+@@ -43,11 +43,12 @@ def smart_inference_mode():
+     """Applies torch.inference_mode() decorator if torch>=1.9.0 else torch.no_grad() decorator."""
+ 
+     def decorate(fn):
++        return fn
+         """Applies appropriate torch decorator for inference mode based on torch version."""
+-        if TORCH_1_9 and torch.is_inference_mode_enabled():
+-            return fn  # already in inference_mode, act as a pass-through
+-        else:
+-            return (torch.inference_mode if TORCH_1_9 else torch.no_grad)()(fn)
++        #if TORCH_1_9 and torch.is_inference_mode_enabled():
++        #    return fn  # already in inference_mode, act as a pass-through
++        #else:
++        #    return (torch.inference_mode if TORCH_1_9 else torch.no_grad)()(fn)
+ 
+     return decorate
+ 

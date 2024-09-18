@@ -1,0 +1,40 @@
+diff --git a/models/yolo.py b/models/yolo.py
+index 95a019c..2613942 100644
+--- a/models/yolo.py
++++ b/models/yolo.py
+@@ -51,7 +51,8 @@ class Detect(nn.Module):
+             if not self.training:  # inference
+                 if self.grid[i].shape[2:4] != x[i].shape[2:4]:
+                     self.grid[i] = self._make_grid(nx, ny).to(x[i].device)
+-                y = x[i].sigmoid()
++                y = x[i]
++                y[:] = y[:].sigmoid()
+                 if not torch.onnx.is_in_onnx_export():
+                     y[..., 0:2] = (y[..., 0:2] * 2. - 0.5 + self.grid[i]) * self.stride[i]  # xy
+                     y[..., 2:4] = (y[..., 2:4] * 2) ** 2 * self.anchor_grid[i]  # wh
+diff --git a/utils/torch_utils.py b/utils/torch_utils.py
+index 1e631b5..e86a98b 100644
+--- a/utils/torch_utils.py
++++ b/utils/torch_utils.py
+@@ -191,12 +191,12 @@ def fuse_conv_and_bn(conv, bn):
+     # prepare filters
+     w_conv = conv.weight.clone().view(conv.out_channels, -1)
+     w_bn = torch.diag(bn.weight.div(torch.sqrt(bn.eps + bn.running_var)))
+-    fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.shape))
++    fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.shape).detach())
+ 
+     # prepare spatial bias
+     b_conv = torch.zeros(conv.weight.size(0), device=conv.weight.device) if conv.bias is None else conv.bias
+     b_bn = bn.bias - bn.weight.mul(bn.running_mean).div(torch.sqrt(bn.running_var + bn.eps))
+-    fusedconv.bias.copy_(torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn)
++    fusedconv.bias.copy_((torch.mm(w_bn, b_conv.reshape(-1, 1)).reshape(-1) + b_bn).detach())
+ 
+     return fusedconv
+ 
+@@ -371,4 +371,4 @@ class TracedModel(nn.Module):
+     def forward(self, x, augment=False, profile=False):
+         out = self.model(x)
+         out = self.detect_layer(out)
+-        return out
+\ No newline at end of file
++        return out
