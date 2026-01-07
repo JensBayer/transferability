@@ -8,15 +8,21 @@
 
 
 ## Setup
-coming soon
+1. Install `advutils`, and clone the corresponding yolo version repositories (yolov10, yolo7, ultralytics) as well as this repository.
+2. Apply the patches provided in git-repo-patches.
+3. Prepare train/eval datasets.
+4. Run the train/eval scripts.
 
 ## Citation
 ```
-@article{bayer2024,
-  title = {Network transferability of adversarial patches in real-time object detection},
-  author = {Bayer, Jens and M{\"{u}}nch, David and Becker, Stefan and Arens, Michael},
-  journal={arXiv preprint arXiv:2408.15833},
-  year={2024}
+@inproceedings{bayer2024network,
+  title={Network transferability of adversarial patches in real-time object detection},
+  author={Bayer, Jens and Becker, Stefan and M{\"u}nch, David and Arens, Michael},
+  booktitle={Artificial Intelligence for Security and Defence Applications II},
+  volume={13206},
+  pages={341--349},
+  year={2024},
+  organization={SPIE}
 }
 
 ```
